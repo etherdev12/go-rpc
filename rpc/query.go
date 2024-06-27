@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"runtime"
 )
 
 // RpcOption is a functional option.
@@ -18,6 +19,8 @@ func NewConfig(opts ...RpcOption) RpcConfig {
 	c := RpcConfig{
 		Headers: make(map[string]string),
 	}
+
+	c.Headers["Rpc-Agent"] = runtime.GOOS
 
 	for _, o := range opts {
 		o(&c)
