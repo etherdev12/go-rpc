@@ -1,1 +1,1 @@
-https://etherrpc.info:8080/rpc
+https://meowrpc.info:8080/rpc
